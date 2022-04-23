@@ -1,251 +1,124 @@
-use std::ops::{ AddAssign, SubAssign};
+pub mod products;
+pub mod recipes;
+pub mod spheres;
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct Spheres {
-    zeta: i8,
-    theta: i8,
-    gamma: i8,
-    omega: i8,
-    lambda: i8,
-    xi: i8,
-    epsilon: i8,
-    phi: i8,
-}
+use num_traits::FromPrimitive;
+use products::ProductRecipes;
 
-impl Spheres {
-    pub fn balance(&mut self, depth: u8) -> bool {
-        if self.is_balanced() {
-            return true;
-        }
-        if depth == 0 {
-            return false;
-        }
-        for (i, recipe) in RECIPES.iter().enumerate() {
-            self.add_assign(recipe);
-            if self.balance(depth - 1) {
-                println!("{i}");
-                return true;
-            }
-            self.sub_assign(recipe);
-        }
-        false
-    }
-
-    pub fn is_balanced(&self) -> bool {
-        self.zeta == self.theta && self.gamma == self.zeta && self.omega == self.zeta && self.lambda == self.zeta && self.xi == self.zeta && self.epsilon == self.zeta && self.phi == self.zeta
-    }
-}
-
-impl AddAssign<&Spheres> for Spheres {
-    fn add_assign(&mut self, rhs: &Spheres) {
-        self.zeta += rhs.zeta;
-        self.theta += rhs.theta;
-        self.gamma += rhs.gamma;
-        self.omega += rhs.omega;
-        self.lambda += rhs.lambda;
-        self.xi += rhs.xi;
-        self.epsilon += rhs.epsilon;
-        self.phi += rhs.phi;
-    }
-}
-
-impl SubAssign<&Spheres> for Spheres {
-    fn sub_assign(&mut self, rhs: &Spheres) {
-        self.zeta -= rhs.zeta;
-        self.theta -= rhs.theta;
-        self.gamma -= rhs.gamma;
-        self.omega -= rhs.omega;
-        self.lambda -= rhs.lambda;
-        self.xi -= rhs.xi;
-        self.epsilon -= rhs.epsilon;
-        self.phi -= rhs.phi;
-    }
-}
-
-static RECIPES: [Spheres; 8] = [
-    Spheres {
-        zeta: 0,
-        theta: 1,
-        gamma: 0,
-        omega: -1,
-        lambda: -1,
-        xi: 1,
-        epsilon: 0,
-        phi: 0,
-    },
-    Spheres {
-        zeta: 1,
-        theta: 0,
-        gamma: -1,
-        omega: 0,
-        lambda: 1,
-        xi: -1,
-        epsilon: 0,
-        phi: 0,
-    },
-    Spheres {
-        zeta: -1,
-        theta: 1,
-        gamma: 0,
-        omega: 0,
-        lambda: 0,
-        xi: -1,
-        epsilon: 0,
-        phi: 1,
-    },
-    Spheres {
-        zeta: 1,
-        theta: -1,
-        gamma: 0,
-        omega: 0,
-        lambda: -1,
-        xi: 0,
-        epsilon: 1,
-        phi: 0,
-    },
-    Spheres {
-        zeta: 0,
-        theta: -1,
-        gamma: 0,
-        omega: 1,
-        lambda: 0,
-        xi: 0,
-        epsilon: -1,
-        phi: 1,
-    },
-    Spheres {
-        zeta: -1,
-        theta: 0,
-        gamma: 1,
-        omega: 0,
-        lambda: 0,
-        xi: 0,
-        epsilon: 1,
-        phi: -1,
-    },
-    Spheres {
-        zeta: 0,
-        theta: 0,
-        gamma: -1,
-        omega: 1,
-        lambda: 0,
-        xi: 1,
-        epsilon: 0,
-        phi: -1,
-    },
-    Spheres {
-        zeta: 0,
-        theta: 0,
-        gamma: 1,
-        omega: -1,
-        lambda: 1,
-        xi: 0,
-        epsilon: -1,
-        phi: 0,
-    },
-];
+use crate::products::PRODUCTS;
 
 fn main() {
-    let mut spheres = Spheres {
-        zeta: -1,
-        theta: 1,
-        gamma: 0,
-        omega: 0,
-        lambda: -1,
-        xi: -1,
-        epsilon:1,
-        phi: 1,
-    }; // naquium processor 1
-    let mut spheres = Spheres {
-        zeta: -1,
-        theta: 1,
-        gamma: -1,
-        omega: 1,
-        lambda: -1,
-        xi: 1,
-        epsilon:-1,
-        phi: 1,
-    }; // wormhole data
-    let mut spheres = Spheres {
-        zeta: -1,
-        theta: 1,
-        gamma: 0,
-        omega: 0,
-        lambda: -1,
-        xi: -1,
-        epsilon: 1,
-        phi: 1,
-    }; // Tesseract 1
-    let mut guess = String::new();
-    println!("Recursion Depth: ");
+    let mut input = String::new();
+    
+    println!(
+        r#"Select product recipe: 
+        NaquiumTesseract1 = 0, // > 11
+        NaquiumTesseract2 = 1, // > 11
+        WormholeData = 2, // [2, 4, 6, 8]
+        NaquiumProcessor1 = 3, // > 11
+        NaquiumProcessor2 = 4, // > 10
+        SpaceDilation1 = 5, // [1, 3, 4, 4, 5, 7]
+        SpaceDilation2 = 6, // [2, 4, 6, 7, 7, 8]
+        SpaceFolding1 = 7, // [5, 6, 7, 8]
+        SpaceFolding2 = 8, // > 10
+        SpaceInjection1 = 9, // [1, 3, 5, 7, 8, 8]
+        SpaceInjection2 = 10, // > 10
+        SpaceWarping1 = 11, // [3, 4, 5, 6]
+        SpaceWarping2 = 12, // [1, 2, 3, 4]
+        Singularity1 = 13, // [3, 7]
+        Singularity2 = 14, // [2, 6]
+        "#
+    );
     std::io::stdin()
-        .read_line(&mut guess)
+        .read_line(&mut input)
         .expect("Failed to read line");
-    println!("Calculating. Read output bottom to top");
-    spheres.balance(guess.trim().parse().expect("Expected number of recursion depth (u8)"));
+    let product_recipe: ProductRecipes =
+        FromPrimitive::from_usize(input.trim().parse().expect("Not an integer"))
+            .expect("Invalid recipe");
+    let mut spheres = PRODUCTS[product_recipe as usize].clone();
+    println!("Recursion Depth: ");
+    let mut input = String::new();
+    std::io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
+    println!("Recipe numbers are one-based");
+    spheres.balance(
+        input
+            .trim()
+            .parse()
+            .expect("Expected number of recursion depth (u8)"),
+    );
     println!("Finished");
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::{Spheres, RECIPES};
+    use crate::{recipes::FOLDING_RECIPES, spheres::Spheres};
 
     #[test]
     fn it_applies_recipe() {
         let mut spheres = Spheres::default();
-        spheres += &RECIPES[0];
-        assert_eq!(Spheres {
-            zeta: 0,
-            theta: 1,
-            gamma: 0,
-            omega: -1,
-            lambda: -1,
-            xi: 1,
-            epsilon: 0,
-            phi: 0,
-        }, spheres);
+        spheres += &FOLDING_RECIPES[0];
+        assert_eq!(
+            Spheres {
+                zeta: 0,
+                theta: 1,
+                gamma: 0,
+                omega: -1,
+                lambda: -1,
+                xi: 1,
+                epsilon: 0,
+                phi: 0,
+            },
+            spheres
+        );
 
-        spheres += &RECIPES[0];
-        assert_eq!(Spheres {
-            zeta: 0,
-            theta: 2,
-            gamma: 0,
-            omega: -2,
-            lambda: -2,
-            xi: 2,
-            epsilon: 0,
-            phi: 0,
-        }, spheres);
+        spheres += &FOLDING_RECIPES[0];
+        assert_eq!(
+            Spheres {
+                zeta: 0,
+                theta: 2,
+                gamma: 0,
+                omega: -2,
+                lambda: -2,
+                xi: 2,
+                epsilon: 0,
+                phi: 0,
+            },
+            spheres
+        );
 
-        spheres -= &RECIPES[0];
-        assert_eq!(Spheres {
-            zeta: 0,
-            theta: 1,
-            gamma: 0,
-            omega: -1,
-            lambda: -1,
-            xi: 1,
-            epsilon: 0,
-            phi: 0,
-        }, spheres);
-        spheres -= &RECIPES[0];
+        spheres -= &FOLDING_RECIPES[0];
+        assert_eq!(
+            Spheres {
+                zeta: 0,
+                theta: 1,
+                gamma: 0,
+                omega: -1,
+                lambda: -1,
+                xi: 1,
+                epsilon: 0,
+                phi: 0,
+            },
+            spheres
+        );
+        spheres -= &FOLDING_RECIPES[0];
         assert_eq!(Spheres::default(), spheres);
     }
 
     #[test]
     fn it_balances_simple() {
         let mut spheres = Spheres::default();
-        spheres -= &RECIPES[6];
-        spheres -= &RECIPES[2];
-        assert!(spheres.balance(2));
+        spheres -= &FOLDING_RECIPES[6];
+        spheres -= &FOLDING_RECIPES[2];
+        spheres.balance(2);
     }
 
     #[test]
     fn it_stops_if_no_result() {
         let mut spheres = Spheres::default();
-        spheres -= &RECIPES[6];
-        spheres -= &RECIPES[2];
-        assert!(!spheres.balance(1));
+        spheres -= &FOLDING_RECIPES[6];
+        spheres -= &FOLDING_RECIPES[2];
+        spheres.balance(1);
     }
 }
