@@ -16,32 +16,6 @@ pub struct Spheres {
 
 impl Spheres {
     pub fn balance(&mut self, depth: u8, multiplier: i16) -> bool {
-        // let start = Instant::now();
-        // let result;
-        // if depth > 20 {
-        //     println!("Spawning threads");
-        //     let mut handles = vec![];
-        //     let success = Arc::new(Mutex::new(false));
-
-        //     for (i, recipe) in FOLDING_RECIPES.iter().enumerate() {
-        //         let mut cloned = self.clone();
-        //         let success = Arc::clone(&success);
-        //         handles.push(std::thread::spawn(move || {
-        //             let local_start = Instant::now();
-        //             let mut path = vec![];
-        //             path.push(i as u8);
-        //             cloned.add_assign(recipe);
-        //             let mut res = success.lock().unwrap();
-        //             *res |= cloned._balance(depth - 1, &mut path, i);
-        //             println!("Time elapsed in thread {i}: {:?}", local_start.elapsed());
-        //         }));
-        //     }
-        //     for handle in handles {
-        //         handle.join().unwrap();
-        //     }
-        //     result = *success.lock().unwrap();
-        // } else {
-
         if (self.zeta + self.theta + self.gamma + self.omega) % 4 != 0
             || (self.lambda + self.xi + self.epsilon + self.phi) % 4 != 0
         {
@@ -75,8 +49,6 @@ impl Spheres {
                 path.iter().map(|step| step + 1).collect::<Vec<u8>>()
             );
         }
-        // }
-        // println!("Total time elapsed: {:?}", start.elapsed());
         result
     }
 
@@ -97,12 +69,6 @@ impl Spheres {
             // we reached a loop, so we can return. It's no longer the shortest path
             return false;
         }
-
-        // if self.zeta + self.theta + self.gamma + self.omega
-        //     != self.lambda + self.xi + self.epsilon + self.phi
-        // {
-        //     return false;
-        // }
 
         for (i, recipe) in FOLDING_RECIPES
             .iter()
