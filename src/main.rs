@@ -12,17 +12,17 @@ fn main() {
     
     println!(
         r#"Select product recipe: 
-        NaquiumTesseract1 = 0, // > 11
-        NaquiumTesseract2 = 1, // > 11
+        NaquiumTesseract1 = 0, // > 12
+        NaquiumTesseract2 = 1, // > 12
         WormholeData = 2, // [2, 4, 6, 8]
-        NaquiumProcessor1 = 3, // > 11
-        NaquiumProcessor2 = 4, // > 10
+        NaquiumProcessor1 = 3, // > 12
+        NaquiumProcessor2 = 4, // > 12
         SpaceDilation1 = 5, // [1, 3, 4, 4, 5, 7]
         SpaceDilation2 = 6, // [2, 4, 6, 7, 7, 8]
         SpaceFolding1 = 7, // [5, 6, 7, 8]
-        SpaceFolding2 = 8, // > 10
+        SpaceFolding2 = 8, // [5, 5, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8]
         SpaceInjection1 = 9, // [1, 3, 5, 7, 8, 8]
-        SpaceInjection2 = 10, // > 10
+        SpaceInjection2 = 10, // > 12
         SpaceWarping1 = 11, // [3, 4, 5, 6]
         SpaceWarping2 = 12, // [1, 2, 3, 4]
         Singularity1 = 13, // [3, 7]
@@ -41,7 +41,7 @@ fn main() {
     std::io::stdin()
         .read_line(&mut input)
         .expect("Failed to read line");
-    println!("Recipe numbers are one-based");
+    println!("Recipe numbers are one-based. Result is not necessarily the shortest recipe");
     spheres.balance(
         input
             .trim()

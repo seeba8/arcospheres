@@ -1,4 +1,4 @@
-use std::ops::{AddAssign, SubAssign};
+use std::{ops::{AddAssign, SubAssign}, time::Instant};
 
 use crate::recipes::{FOLDING_RECIPES, INVERSION_RECIPES};
 
@@ -16,33 +16,58 @@ pub struct Spheres {
 
 impl Spheres {
     pub fn balance(&mut self, depth: u8) {
-        self._balance(depth, &mut vec![])
+        let start = Instant::now();
+        if depth > 10 {
+            println!("Spawning threads");
+            let mut handles = vec![];
+            for (i, recipe) in FOLDING_RECIPES.iter().enumerate() {
+                let mut cloned = self.clone();
+                handles.push(std::thread::spawn(move || {
+                    let local_start = Instant::now();
+                    let mut path = vec![];
+                    path.push(i as u8);
+                    cloned.add_assign(recipe);
+                    cloned._balance(depth - 1, &mut path);
+                    println!("Time elapsed in thread {i}: {:?}", local_start.elapsed());
+                }));
+            }
+            for handle in handles {
+                handle.join().unwrap();
+            }
+        } else {
+            self._balance(depth, &mut vec![]);
+        }
+        println!("Total time elapsed: {:?}", start.elapsed());
     }
-    fn _balance(&mut self, depth: u8, path: &mut Vec<u8>) {
+    fn _balance(&mut self, depth: u8, path: &mut Vec<u8>) -> bool {
         if self.is_balanced() {
             println!(
                 "{:?}",
                 path.iter().map(|step| step + 1).collect::<Vec<u8>>()
             );
-            return;
+            return true;
         }
         if depth == 0 {
-            return;
+            return false;
         }
-        match (self.zeta as i16 + self.theta as i16 + self.gamma as i16 + self.omega as i16)
-            .cmp(&(self.lambda as i16 + self.xi as i16 + self.epsilon as i16 + self.phi as i16))
+        match (self.zeta + self.theta + self.gamma + self.omega)
+            .cmp(&(self.lambda + self.xi + self.epsilon + self.phi))
         {
             std::cmp::Ordering::Greater => self.add_assign(&INVERSION_RECIPES[0]),
             std::cmp::Ordering::Less => self.add_assign(&INVERSION_RECIPES[1]),
             std::cmp::Ordering::Equal => (),
         }
+        assert!(self.zeta + self.theta + self.gamma + self.omega == self.lambda + self.xi + self.epsilon + self.phi);
         for (i, recipe) in FOLDING_RECIPES.iter().enumerate() {
             path.push(i as u8);
             self.add_assign(recipe);
-            self._balance(depth - 1, path);
+            if self._balance(depth - 1, path) {
+                return true;
+            }
             self.sub_assign(recipe);
             path.pop();
         }
+        return false;
     }
 
     pub fn is_balanced(&self) -> bool {

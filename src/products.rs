@@ -4,7 +4,7 @@ use crate::spheres::Spheres;
 
 #[derive(Debug, FromPrimitive)]
 pub enum ProductRecipes {
-    NaquiumTesseract1 = 0, // > 11
+    NaquiumTesseract1 = 0, // > 12
     NaquiumTesseract2 = 1, // > 11
     WormholeData = 2, // [2, 4, 6, 8]
     NaquiumProcessor1 = 3, // > 11
@@ -112,14 +112,14 @@ pub static PRODUCTS: [Spheres; 15] = [
     },
     Spheres {
         // SpaceFolding2
-        zeta: 1,
-        theta: 1,
+        zeta: 4,
+        theta: 4,
         gamma: 0,
         omega: 0,
-        lambda: -1,
-        xi: -1,
-        epsilon: 1,
-        phi: 1,
+        lambda: -4,
+        xi: -4,
+        epsilon: 4,
+        phi: 4,
     },
     Spheres {
         // SpaceInjection1
